@@ -61,7 +61,8 @@ def runKNN(dataset, prediction, ignore, neighbors):
     print ("F1 Score is: " + str(f1_score(Y_test, Y_pred, average = 'macro')))
     
     return knn 
-
+#PROBLEM 3 (Pt. 2): 
+#The F1 score and accuracy score were both low (roughly 45%) meaning using k-NN to classify a player's position based on their statistics only had a ~45% chance of being correct, and thus effective. For a F1 score to be effective, it would have to be closer to 1.  
 ########IGNORE THIS ONE :) ############
 #def classifyPlayer(targetRow, data, model, prediction, ignore):
     #X = targetRow.drop(columns=[prediction, ignore])
