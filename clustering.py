@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import numpy as np
+
 #import ML support libraries
 from sklearn.cross_validation import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
@@ -39,6 +40,7 @@ def runKNN(dataset, prediction, ignore, neighbors):
     #need to specify test size (what proportion of dataset do I actually want to consider) i.e 20% of data
     #random state-- am I selecting them randomly
     #Stratify try to get a nice uniform sampling of all the different possible settings
+
 #PROBLEM 3 (Pt. 1): test_size was originally 0.2
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.4, random_state = 1, stratify = Y)
      
@@ -51,7 +53,7 @@ def runKNN(dataset, prediction, ignore, neighbors):
     #build the model using feature values to try and predict my dependent variable 
     knn.fit(X_train, Y_train)
     
-    #test the model: 
+    #Test the model: 
     score = knn.score(X_test, Y_test)
     Y_pred = knn.predict(X_test)
     print("Predicts " + prediction + " with " + str(score) + " accuracy")
@@ -60,7 +62,7 @@ def runKNN(dataset, prediction, ignore, neighbors):
     
     return knn 
 
-########CHECK THIS ONE############
+########IGNORE THIS ONE :) ############
 #def classifyPlayer(targetRow, data, model, prediction, ignore):
     #X = targetRow.drop(columns=[prediction, ignore])
     
@@ -84,6 +86,7 @@ def kNNCrossfold(dataset, prediction, ignore, neighbors):
     for train,test in kf.split(X): #make a for loop for each kfold plit 
         fold += 1 #adds to the counter we've already made
         knn = KNeighborsClassifier(n_neighbors= neighbors) #uses the k_neighbors classifier for each input 
+        knn = KNeighborsClassifier(n_neighbors = neighbors) #uses the kneighbors classifier for each of the k's (the 5,7,10).  
         knn.fit(X[train[0]:train[-1]], Y[train[0]:train[-1]]) #fit the data in order to train the classifier on each of the folds. It will remove the last one for testing. 
 
         pred = knn.predict(X[test[0]:test[-1]]) #knn.predict will predict the class labels for the provided the data. THis will predict the class labels for all the data in X from "column" 0 all the way to "column" -1, aka all but the last one because you're testing on the last one. 
@@ -101,8 +104,9 @@ def determineK(dataset, prediction, ignore, k_vals):
     
     for k in k_vals: #for loop in order to loop through the k values, 5,7 and 10
         current_k = kNNCrossfold(dataset, prediction, ignore, k) #runs the kNN cross validation function (from problem 4) for each k value in k_vals
-        best_k = k # if the k is better than the stored accuracy, then reset the variable k to the k value being looped through 
-        best_accuracy = current_k #stores the current k value as the best accuracy 
+        if current_k > best_accuracy: #if statement saying if the current k value was better than the best accuracy that's being stored. K is computed using the kNNCrossfold 
+            best_k = k # if the k is better than the stored accuracy, then reset the variable k to the k value being looped through 
+            best_accuracy = current_k #stores the current k value as the best accuracy 
     
     print("Best k, accuracy = " + str(best_k) + ", " + str(best_accuracy)) #prints the best k and its accuracy  
         
@@ -114,7 +118,7 @@ def runKMeans(dataset, ignore, neighbors):
     
     #Run K-means algorithm
     #choose k here, remember for kmeans is increase k until we stop getting noticeble gains 
-    kmeans = KMeans(n_clusters = 5)
+    kmeans = KMeans(n_clusters = neighbors)
     
     #Train the model
     kmeans.fit(X)
@@ -124,6 +128,8 @@ def runKMeans(dataset, ignore, neighbors):
     #predict x variable, line up indicies with my indicies in my dataframe 
     dataset['cluster'] = pd.Series(kmeans.predict(X), index = dataset.index)
     
+    return kmeans
+
 #PROBLEM 7
 #From https://datascience.stackexchange.com/a/41125
 
@@ -149,7 +155,7 @@ def findClusterK(dataset, ignore):
     #will save it as a static visualization 
     #could build this out into Altair
     
-    return kmeans
+    #return kmeans
 
     
 
@@ -161,11 +167,12 @@ knnModel = runKNN(nbaData, "pos", "player", 7)
 #classifyPlayer(nbaData.loc[nbaData['player'] == 'LeBron James'], nbaData, knnModel, 'pos', 'player')
 #locate the row where my player value equals Lebron and pass the rest of the arguments for the function
 
-determineK(nbaData, "pos", "player", [5,7,10]) 
-kmeansModel = runKMeans(nbaData, ['pos', 'player'], 5)
-
 for k in [5,7,10]:
     print("Folds: " + str(k))
-    kNNCrossfold(nbaData, "pos", "player", 3)
-    
+    kNNCrossfold(nbaData, "pos", "player", k)
+
+determineK(nbaData, "pos", "player", [5,7,10])
+
+kmeansModel = runKMeans(nbaData, ['pos', 'player'], 5)
+
 findClusterK(nbaData, ['pos', 'player']) 
