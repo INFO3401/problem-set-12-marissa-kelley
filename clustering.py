@@ -63,16 +63,17 @@ def runKNN(dataset, prediction, ignore, neighbors):
     return knn 
 #PROBLEM 3 (Pt. 2): 
 #The F1 score and accuracy score were both low (roughly 45%) meaning using k-NN to classify a player's position based on their statistics only had a ~45% chance of being correct, and thus effective. For a F1 score to be effective, it would have to be closer to 1.  
-########IGNORE THIS ONE :) ############
-#def classifyPlayer(targetRow, data, model, prediction, ignore):
-    #X = targetRow.drop(columns=[prediction, ignore])
+
+
+def classifyPlayer(targetRow, data, model, prediction, ignore):
+    X = targetRow.drop(columns=[prediction, ignore])
     
-    #Determine the five closest neighbors to our target row
-    #neighbors = model.kneighbors(X, n_neighbors=5, return_distance = False)
+    Determine the five closest neighbors to our target row
+    neighbors = model.kneighbors(X, n_neighbors=5, return_distance = False)
     
     #Print out the neighbors data
-    #for neighbor in neighbors[0]:
-        #print(data.iloc[neighbors]) #iloc is the index location 
+    for neighbor in neighbors[0]:
+        print(data.iloc[neighbors]) #iloc is the index location 
 
 #PROBLEM 4
 def kNNCrossfold(dataset, prediction, ignore, neighbors):
@@ -159,9 +160,7 @@ def findClusterK(dataset, ignore):
     #return kmeans
 
     
-
-    
-#Test your code
+######Test your code######
 nbaData = loadData("nba_2013_clean.csv")
 knnModel = runKNN(nbaData, "pos", "player", 7)
 #^predict position, ignore player 
